@@ -1,0 +1,155 @@
+
+sign_cross
+In the name of the Father, and of the Son, and of the Holy Spirit. Amen.
+
+===
+
+apostles_creed
+I believe in God, the Father Almighty, Creator of heaven and earth,
+and in Jesus Christ, His only Son, our Lord,
+who was conceived by the Holy Spirit, born of the Virgin Mary,
+suffered under Pontius Pilate, was crucified, died and was buried;
+He descended into hell; on the third day He rose again from the dead;
+He ascended into heaven, and is seated at the right hand of God the Father Almighty;
+from there He will come to judge the living and the dead.
+I believe in the Holy Spirit, the Holy Catholic Church,
+the communion of saints, the forgiveness of sins,
+the resurrection of the body, and life everlasting. Amen.
+
+===
+
+fatima_prayer
+O my Jesus, forgive us our sins, save us from the fires of hell,
+and lead all souls to Heaven, especially those in most need of Thy mercy.
+
+===
+
+hail_holy_queen
+Hail, Holy Queen, Mother of mercy, our life, our sweetness, and our hope.
+To thee do we cry, poor banished children of Eve.
+To thee do we send up our sighs, mourning and weeping in this valley of tears.
+Turn then, most gracious advocate, thine eyes of mercy toward us,
+and after this our exile, show unto us the blessed fruit of thy womb, Jesus.
+O clement, O loving, O sweet Virgin Mary.
+Pray for us, O holy Mother of God,
+that we may be made worthy of the promises of Christ.
+
+===
+
+rosary_final_prayer
+Let us pray: O God, whose only begotten Son, by His life, death, and resurrection,
+has purchased for us the rewards of eternal life,
+grant, we beseech Thee, that meditating upon these mysteries
+of the Most Holy Rosary of the Blessed Virgin Mary,
+we may imitate what they contain and obtain what they promise,
+through the same Christ Our Lord. Amen.
+
+===
+
+mystery_joyful
+The Joyful Mysteries
+
+===
+
+joyful_mystery_1
+The Annunciation
+
+===
+
+joyful_meditation_1
+The angel Gabriel announces to Mary that she will conceive and bear a son by the power of the Holy Spirit.
+
+===
+
+joyful_mystery_2
+The Visitation
+
+===
+
+joyful_meditation_2
+Mary visits her cousin Elizabeth, who is pregnant with John the Baptist.
+
+===
+
+joyful_mystery_3
+The Nativity
+
+===
+
+joyful_meditation_3
+Jesus is born in Bethlehem and laid in a manger.
+
+===
+
+joyful_mystery_4
+The Presentation
+
+===
+
+joyful_meditation_4
+Mary and Joseph present the infant Jesus in the temple.
+
+===
+
+joyful_mystery_5
+The Finding in the Temple
+
+===
+
+joyful_meditation_5
+The twelve-year-old Jesus is found teaching in the temple.
+
+===
+
+mystery_sorrowful
+The Sorrowful Mysteries
+
+===
+
+sorrowful_mystery_1
+The Agony in the Garden
+
+===
+
+sorrowful_meditation_1
+Jesus prays in the Garden of Gethsemane on the night before He died.
+
+===
+
+sorrowful_mystery_2
+The Scourging at the Pillar
+
+===
+
+sorrowful_meditation_2
+Jesus is brutally scourged by the Roman soldiers.
+
+===
+
+sorrowful_mystery_3
+The Crowning with Thorns
+
+===
+
+sorrowful_meditation_3
+Jesus is crowned with thorns and mocked as King of the Jews.
+
+===
+
+sorrowful_mystery_4
+The Carrying of the Cross
+
+===
+
+sorrowful_meditation_4
+Jesus carries His cross to Calvary.
+
+===
+
+sorrowful_mystery_5
+The Crucifixion
+
+===
+
+sorrowful_meditation_5
+Jesus is nailed to the cross and dies for our salvation.
