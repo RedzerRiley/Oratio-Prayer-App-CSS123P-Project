@@ -3,11 +3,13 @@ package com.oratio.services;
 
 import com.oratio.models.Psalm;
 
+import java.awt.Color;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Service for managing psalms
+ * Service for managing psalms with text highlighting support
  */
 public class PsalmService {
     private static PsalmService instance;
@@ -15,9 +17,14 @@ public class PsalmService {
     private Set<Integer> favoritePsalmNumbers = new HashSet<>();
     private LanguageService languageService;
 
+    // Highlight management
+    private Map<String, List<HighlightData>> highlightsByPsalm = new HashMap<>();
+    private static final String HIGHLIGHTS_FILE = "user_data/psalm_highlights.dat";
+
     private PsalmService() {
         languageService = LanguageService.getInstance();
         initializePsalms();
+        loadHighlights();
     }
 
     public static PsalmService getInstance() {
@@ -53,7 +60,6 @@ public class PsalmService {
         String key = String.format("psalm_%d_title", psalm.getNumber());
         String translation = languageService.getTranslation(key, language);
 
-        // If no specific title translation, use default format
         if (translation.equals(key)) {
             return String.format("Psalm %d", psalm.getNumber());
         }
@@ -82,21 +88,176 @@ public class PsalmService {
                 .collect(Collectors.toList());
     }
 
+    // ==================== HIGHLIGHT FEATURE METHODS ====================
+
+    /**
+     * Add a highlight to a specific psalm
+     * @param psalmNumber The psalm number
+     * @param startIndex Start position of highlight
+     * @param endIndex End position of highlight
+     * @param color Highlight color
+     */
+    public void addHighlight(int psalmNumber, int startIndex, int endIndex, Color color) {
+        String psalmKey = String.valueOf(psalmNumber);
+
+        if (!highlightsByPsalm.containsKey(psalmKey)) {
+            highlightsByPsalm.put(psalmKey, new ArrayList<>());
+        }
+
+        HighlightData highlight = new HighlightData(startIndex, endIndex, color);
+        highlightsByPsalm.get(psalmKey).add(highlight);
+
+        saveHighlights();
+    }
+
+    /**
+     * Remove a specific highlight from a psalm
+     * @param psalmNumber The psalm number
+     * @param startIndex Start position of highlight to remove
+     * @param endIndex End position of highlight to remove
+     */
+    public void removeHighlight(int psalmNumber, int startIndex, int endIndex) {
+        String psalmKey = String.valueOf(psalmNumber);
+
+        if (highlightsByPsalm.containsKey(psalmKey)) {
+            List<HighlightData> highlights = highlightsByPsalm.get(psalmKey);
+            highlights.removeIf(h -> h.startIndex == startIndex && h.endIndex == endIndex);
+
+            if (highlights.isEmpty()) {
+                highlightsByPsalm.remove(psalmKey);
+            }
+
+            saveHighlights();
+        }
+    }
+
+    /**
+     * Clear all highlights for a specific psalm
+     * @param psalmNumber The psalm number
+     */
+    public void clearAllHighlights(int psalmNumber) {
+        String psalmKey = String.valueOf(psalmNumber);
+        highlightsByPsalm.remove(psalmKey);
+        saveHighlights();
+    }
+
+    /**
+     * Get all highlights for a specific psalm
+     * @param psalmNumber The psalm number
+     * @return List of highlights
+     */
+    public List<HighlightData> getHighlights(int psalmNumber) {
+        String psalmKey = String.valueOf(psalmNumber);
+        return highlightsByPsalm.getOrDefault(psalmKey, new ArrayList<>());
+    }
+
+    /**
+     * Check if a psalm has any highlights
+     * @param psalmNumber The psalm number
+     * @return true if psalm has highlights
+     */
+    public boolean hasHighlights(int psalmNumber) {
+        String psalmKey = String.valueOf(psalmNumber);
+        return highlightsByPsalm.containsKey(psalmKey) &&
+                !highlightsByPsalm.get(psalmKey).isEmpty();
+    }
+
+    /**
+     * Save highlights to file
+     */
+    private void saveHighlights() {
+        try {
+            File file = new File(HIGHLIGHTS_FILE);
+            file.getParentFile().mkdirs();
+
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+                oos.writeObject(highlightsByPsalm);
+            }
+
+            System.out.println("Highlights saved successfully");
+
+        } catch (IOException e) {
+            System.err.println("Error saving highlights: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Load highlights from file
+     */
+    @SuppressWarnings("unchecked")
+    private void loadHighlights() {
+        File file = new File(HIGHLIGHTS_FILE);
+
+        if (!file.exists()) {
+            System.out.println("No saved highlights found");
+            return;
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            highlightsByPsalm = (Map<String, List<HighlightData>>) ois.readObject();
+            System.out.println("Highlights loaded successfully: " + highlightsByPsalm.size() + " psalms with highlights");
+
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error loading highlights: " + e.getMessage());
+            highlightsByPsalm = new HashMap<>();
+        }
+    }
+
+    // ==================== HIGHLIGHT DATA CLASS ====================
+
+    /**
+     * Data class for storing highlight information
+     */
+    public static class HighlightData implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private int startIndex;
+        private int endIndex;
+        private int colorRGB;
+
+        public HighlightData(int startIndex, int endIndex, Color color) {
+            this.startIndex = startIndex;
+            this.endIndex = endIndex;
+            this.colorRGB = color.getRGB();
+        }
+
+        public int getStartIndex() {
+            return startIndex;
+        }
+
+        public int getEndIndex() {
+            return endIndex;
+        }
+
+        public Color getColor() {
+            return new Color(colorRGB);
+        }
+
+        public int getColorRGB() {
+            return colorRGB;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Highlight[%d-%d, color=%d]", startIndex, endIndex, colorRGB);
+        }
+    }
+
     private void initializePsalms() {
         allPsalms = new ArrayList<>();
 
-        // Initialize with common psalms (in a real app, this would load from files)
         String[] commonPsalmTitles = {
-                "The Lord is My Shepherd", // Psalm 23
-                "Create in Me a Clean Heart", // Psalm 51
-                "Praise the Lord", // Psalm 150
-                "Out of the Depths", // Psalm 130
-                "The Lord is My Light", // Psalm 27
-                "Give Thanks to the Lord", // Psalm 136
-                "Bless the Lord, O My Soul", // Psalm 103
-                "How Lovely is Your Dwelling Place", // Psalm 84
-                "The Earth is the Lord's", // Psalm 24
-                "I Will Lift Up My Eyes" // Psalm 121
+                "The Lord is My Shepherd",
+                "Create in Me a Clean Heart",
+                "Praise the Lord",
+                "Out of the Depths",
+                "The Lord is My Light",
+                "Give Thanks to the Lord",
+                "Bless the Lord, O My Soul",
+                "How Lovely is Your Dwelling Place",
+                "The Earth is the Lord's",
+                "I Will Lift Up My Eyes"
         };
 
         int[] psalmNumbers = {23, 51, 150, 130, 27, 136, 103, 84, 24, 121};
@@ -105,16 +266,13 @@ public class PsalmService {
             allPsalms.add(new Psalm(psalmNumbers[i], commonPsalmTitles[i]));
         }
 
-        // Add more psalms (1-150)
         for (int i = 1; i <= 150; i++) {
-            final int psalmNum = i; // make a final copy for the lambda
+            final int psalmNum = i;
             if (Arrays.stream(psalmNumbers).noneMatch(x -> x == psalmNum)) {
                 allPsalms.add(new Psalm(psalmNum, String.format("Psalm %d", psalmNum)));
             }
         }
 
-
-        // Sort by psalm number
         allPsalms.sort(Comparator.comparingInt(Psalm::getNumber));
     }
 }

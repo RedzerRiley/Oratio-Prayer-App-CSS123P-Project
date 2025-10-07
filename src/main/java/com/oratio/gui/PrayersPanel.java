@@ -222,7 +222,7 @@ public class PrayersPanel extends JPanel {
                 panel.setBackground(themeService.getAccentColor());
                 panel.setOpaque(true);
             } else {
-                panel.setBackground(themeService.getCardBackgroundColor());
+                    panel.setBackground(themeService.getCardBackgroundColor());
                 panel.setOpaque(true);
             }
 

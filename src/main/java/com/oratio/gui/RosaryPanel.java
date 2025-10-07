@@ -1,9 +1,8 @@
-
-// File: src/main/java/com/oratio/gui/RosaryPanel.java
 package com.oratio.gui;
 
 import com.oratio.models.RosaryMystery;
 import com.oratio.models.RosaryStep;
+import com.oratio.models.PrayerTimer;
 import com.oratio.services.RosaryService;
 import com.oratio.services.LanguageService;
 import com.oratio.services.ThemeService;
@@ -12,7 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class RosaryPanel extends JPanel {
+public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionListener {
     private JLabel mysteryLabel;
     private JLabel stepCounterLabel;
     private JTextArea stepTextArea;
@@ -20,6 +19,13 @@ public class RosaryPanel extends JPanel {
     private JButton nextButton;
     private JButton resetButton;
     private JComboBox<RosaryMystery> mysterySelector;
+
+    // Timer components
+    private JLabel timerLabel;
+    private JButton pauseResumeButton;
+    private JButton resetTimerButton;
+    private Timer uiUpdateTimer;
+    private boolean sessionActive = false;
 
     private RosaryService rosaryService;
     private LanguageService languageService;
@@ -30,26 +36,28 @@ public class RosaryPanel extends JPanel {
         initializeServices();
         initializeGUI();
         setupEventHandlers();
+        setupTimerUpdater();
         loadTodaysMystery();
     }
 
     private void initializeServices() {
         rosaryService = RosaryService.getInstance();
         languageService = LanguageService.getInstance();
+        rosaryService.addSessionListener(this);
     }
 
     private void initializeGUI() {
         setLayout(new BorderLayout(10, 10));
         setBackground(ThemeService.getInstance().getBackgroundColor());
 
-        // Top panel for mystery selection
+        // Top panel for mystery selection and timer
         JPanel topPanel = new JPanel(new BorderLayout(0, 10));
         topPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
         topPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(ThemeService.getInstance().getBorderColor()),
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
-        topPanel.setPreferredSize(new Dimension(0, 100));
+        topPanel.setPreferredSize(new Dimension(0, 140));
 
         JPanel selectorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         selectorPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
@@ -68,8 +76,12 @@ public class RosaryPanel extends JPanel {
         mysteryLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mysteryLabel.setForeground(ThemeService.getInstance().getForegroundColor());
 
+        // Timer panel
+        JPanel timerPanel = createTimerPanel();
+
         topPanel.add(selectorPanel, BorderLayout.NORTH);
         topPanel.add(mysteryLabel, BorderLayout.CENTER);
+        topPanel.add(timerPanel, BorderLayout.SOUTH);
         add(topPanel, BorderLayout.NORTH);
 
         // Center panel for step content
@@ -131,6 +143,31 @@ public class RosaryPanel extends JPanel {
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
+    private JPanel createTimerPanel() {
+        JPanel timerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        timerPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
+
+        JLabel timerIconLabel = new JLabel("⏱ ");
+        timerIconLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        timerIconLabel.setForeground(ThemeService.getInstance().getForegroundColor());
+        timerPanel.add(timerIconLabel);
+
+        timerLabel = new JLabel("00:00");
+        timerLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        timerLabel.setForeground(ThemeService.getInstance().getAccentColor());
+        timerPanel.add(timerLabel);
+
+        pauseResumeButton = new JButton("⏸ Pause");
+        styleTimerButton(pauseResumeButton);
+        timerPanel.add(pauseResumeButton);
+
+        resetTimerButton = new JButton("↻ Reset Timer");
+        styleTimerButton(resetTimerButton);
+        timerPanel.add(resetTimerButton);
+
+        return timerPanel;
+    }
+
     private void styleButton(JButton button, boolean isPrimary) {
         ThemeService theme = ThemeService.getInstance();
         button.setFont(new Font("Segoe UI", Font.BOLD, 11));
@@ -146,6 +183,16 @@ public class RosaryPanel extends JPanel {
         }
 
         button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+    }
+
+    private void styleTimerButton(JButton button) {
+        ThemeService theme = ThemeService.getInstance();
+        button.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setBackground(theme.getBorderColor());
+        button.setForeground(theme.getForegroundColor());
+        button.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
     }
 
     private void styleComboBox(JComboBox<?> comboBox) {
@@ -171,15 +218,88 @@ public class RosaryPanel extends JPanel {
         });
 
         nextButton.addActionListener(e -> {
-            if (currentSteps != null && currentStepIndex < currentSteps.size() - 1) {
-                currentStepIndex++;
-                displayCurrentStep();
+            if (currentSteps != null) {
+                if (currentStepIndex < currentSteps.size() - 1) {
+                    currentStepIndex++;
+                    displayCurrentStep();
+                } else {
+                    // Reached the end of rosary
+                    endSession();
+                }
             }
         });
 
         resetButton.addActionListener(e -> {
             currentStepIndex = 0;
             displayCurrentStep();
+        });
+
+        pauseResumeButton.addActionListener(e -> togglePauseResume());
+        resetTimerButton.addActionListener(e -> resetTimer());
+    }
+
+    private void setupTimerUpdater() {
+        // Update timer display every second
+        uiUpdateTimer = new Timer(1000, e -> updateTimerDisplay());
+        uiUpdateTimer.start();
+    }
+
+    private void updateTimerDisplay() {
+        PrayerTimer timer = rosaryService.getCurrentTimer();
+        timerLabel.setText(timer.getFormattedTime());
+
+        // Update pause/resume button text
+        if (timer.isRunning()) {
+            pauseResumeButton.setText("⏸ Pause");
+        } else if (timer.isPaused()) {
+            pauseResumeButton.setText("▶ Resume");
+        }
+    }
+
+    private void togglePauseResume() {
+        PrayerTimer timer = rosaryService.getCurrentTimer();
+
+        if (timer.isRunning()) {
+            rosaryService.pausePrayerSession();
+        } else {
+            rosaryService.resumePrayerSession();
+        }
+
+        updateTimerDisplay();
+    }
+
+    private void resetTimer() {
+        int result = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to reset the timer?",
+                "Reset Timer",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (result == JOptionPane.YES_OPTION) {
+            rosaryService.resetPrayerTimer();
+            updateTimerDisplay();
+        }
+    }
+
+    private void endSession() {
+        if (sessionActive) {
+            rosaryService.endPrayerSession();
+            sessionActive = false;
+            updateTimerDisplay();
+        }
+    }
+
+    @Override
+    public void onSessionCompleted(String formattedDuration) {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Rosary session completed!\n\nTotal prayer time: " + formattedDuration,
+                    "Session Complete",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+            // Timer stays paused at final time, showing the total duration
         });
     }
 
@@ -196,6 +316,12 @@ public class RosaryPanel extends JPanel {
             currentSteps = rosaryService.getRosarySteps(mystery);
             currentStepIndex = 0;
             displayCurrentStep();
+
+            // Start timer automatically when loading a mystery
+            if (!sessionActive) {
+                rosaryService.startPrayerSession();
+                sessionActive = true;
+            }
         }
     }
 
@@ -214,7 +340,17 @@ public class RosaryPanel extends JPanel {
             stepTextArea.setCaretPosition(0);
 
             previousButton.setEnabled(currentStepIndex > 0);
-            nextButton.setEnabled(currentStepIndex < currentSteps.size() - 1);
+
+            // On last step, enable finish button
+            if (currentStepIndex == currentSteps.size() - 1) {
+                nextButton.setEnabled(true);
+                nextButton.setText("Finish");
+                styleButton(nextButton, true);
+            } else {
+                nextButton.setEnabled(true);
+                nextButton.setText("Next");
+                styleButton(nextButton, true);
+            }
         }
     }
 
@@ -228,5 +364,13 @@ public class RosaryPanel extends JPanel {
         if (selectedMystery != null) {
             loadMystery(selectedMystery);
         }
+    }
+
+    // Clean up timer when panel is disposed
+    public void dispose() {
+        if (uiUpdateTimer != null) {
+            uiUpdateTimer.stop();
+        }
+        rosaryService.removeSessionListener(this);
     }
 }

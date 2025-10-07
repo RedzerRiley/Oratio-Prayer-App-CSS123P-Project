@@ -1,7 +1,6 @@
 // File: src/main/java/com/oratio/gui/MainFrame.java
 package com.oratio.gui;
 
-import com.oratio.gui.*;
 import com.oratio.services.LanguageService;
 import com.oratio.services.ThemeService;
 import com.oratio.utils.Constants;
@@ -194,8 +193,8 @@ public class MainFrame extends JFrame {
                     g2d.dispose();
                 } else {
                     g.setFont(new Font("Segoe UI", Font.BOLD, 36));
-                    g.setColor(Color.WHITE);
-                    g.drawString("✝ Oratio", 10, getHeight() / 2 + 10);
+                    g.setColor(Color.BLACK);
+                    g.drawString(" Oratio", 10, getHeight() / 2 + 10);
                 }
             }
         };

@@ -1,9 +1,8 @@
 package com.oratio.services;
 
-// File: src/main/java/com/oratio/services/RosaryService.java
-
 import com.oratio.models.RosaryMystery;
 import com.oratio.models.RosaryStep;
+import com.oratio.models.PrayerTimer;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -15,9 +14,17 @@ public class RosaryService {
     private static RosaryService instance;
     private List<RosaryMystery> mysteries;
     private LanguageService languageService;
+    private PrayerTimer currentTimer;
+    private List<PrayerSessionListener> sessionListeners;
+
+    public interface PrayerSessionListener {
+        void onSessionCompleted(String formattedDuration);
+    }
 
     private RosaryService() {
         languageService = LanguageService.getInstance();
+        currentTimer = new PrayerTimer();
+        sessionListeners = new ArrayList<>();
         initializeMysteries();
     }
 
@@ -26,6 +33,74 @@ public class RosaryService {
             instance = new RosaryService();
         }
         return instance;
+    }
+
+    /**
+     * Starts a new prayer session with timer
+     */
+    public void startPrayerSession() {
+        currentTimer.reset();
+        currentTimer.start();
+    }
+
+    /**
+     * Pauses the current prayer session
+     */
+    public void pausePrayerSession() {
+        currentTimer.pause();
+    }
+
+    /**
+     * Resumes the current prayer session
+     */
+    public void resumePrayerSession() {
+        currentTimer.start();
+    }
+
+    /**
+     * Ends the prayer session and notifies listeners
+     */
+    public void endPrayerSession() {
+        if (!currentTimer.isStopped()) {
+            currentTimer.pause();
+            String duration = currentTimer.getFormattedSessionTime();
+            notifySessionCompleted(duration);
+            currentTimer.reset();
+        }
+    }
+
+    /**
+     * Resets the prayer timer
+     */
+    public void resetPrayerTimer() {
+        currentTimer.reset();
+    }
+
+    /**
+     * Gets the current timer
+     */
+    public PrayerTimer getCurrentTimer() {
+        return currentTimer;
+    }
+
+    /**
+     * Adds a session listener
+     */
+    public void addSessionListener(PrayerSessionListener listener) {
+        sessionListeners.add(listener);
+    }
+
+    /**
+     * Removes a session listener
+     */
+    public void removeSessionListener(PrayerSessionListener listener) {
+        sessionListeners.remove(listener);
+    }
+
+    private void notifySessionCompleted(String duration) {
+        for (PrayerSessionListener listener : sessionListeners) {
+            listener.onSessionCompleted(duration);
+        }
     }
 
     public RosaryMystery getTodaysMystery() {
@@ -104,7 +179,7 @@ public class RosaryService {
 
         if (step.getMeditation() != null && !step.getMeditation().isEmpty()) {
             String meditation = languageService.getTranslation(step.getMeditation(), language);
-            return  meditation+ "\n\n" + baseText;
+            return meditation + "\n\n" + baseText;
         }
 
         if (step.getRepetitions() > 1) {
@@ -120,9 +195,8 @@ public class RosaryService {
     }
 
     private String getMysteryMeditation(RosaryMystery mystery, int decade) {
-        return "Meditate and reflect upon this mystery"; // always use the same translation key
+        return "Meditate and reflect upon this mystery";
     }
-
 
     private void initializeMysteries() {
         mysteries = new ArrayList<>();
@@ -137,10 +211,3 @@ public class RosaryService {
                 RosaryMystery.MysteryType.LUMINOUS, new String[]{"Thursday"}));
     }
 }
-
-
-
-// File: src/main/java/com/oratio/services/NovenaService.java
-
-
-// File: src/main/java/com/oratio/services/NotesService.java
