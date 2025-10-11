@@ -2,6 +2,7 @@
 package com.oratio.services;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 
 /**
@@ -31,7 +32,8 @@ public class ThemeService {
     private final Color ACCENT_SUCCESS = new Color(40, 167, 69);
     private final Color ACCENT_WARNING = new Color(255, 193, 7);
 
-    private ThemeService() {}
+    private ThemeService() {
+    }
 
     public static ThemeService getInstance() {
         if (instance == null) {
@@ -97,84 +99,128 @@ public class ThemeService {
         applyModernThemeRecursively(component);
     }
 
+    public void applyTheme(JFrame frame) {
+        UIManager.put("darkMode", isDarkMode);
+        applyModernThemeRecursively(frame);
+    }
+
     private void applyModernThemeRecursively(Component component) {
+        if (component == null) {
+            return;
+        }
+
+        // Apply theme to the component itself
+        applyThemeToComponent(component);
+
+        // Recursively apply to children
+        if (component instanceof Container) {
+            Container container = (Container) component;
+            for (Component child : container.getComponents()) {
+                applyModernThemeRecursively(child);
+            }
+        }
+
+        // Special handling for compound components
+        if (component instanceof JScrollPane) {
+            JScrollPane scrollPane = (JScrollPane) component;
+            applyModernThemeRecursively(scrollPane.getViewport().getView());
+        }
+
+        if (component instanceof JSplitPane) {
+            JSplitPane splitPane = (JSplitPane) component;
+            applyModernThemeRecursively(splitPane.getLeftComponent());
+            applyModernThemeRecursively(splitPane.getRightComponent());
+        }
+    }
+
+    private void applyThemeToComponent(Component component) {
         if (component instanceof JFrame) {
             component.setBackground(getBackgroundColor());
-        } else if (component instanceof JPanel) {
+            component.setForeground(getForegroundColor());
+        }
+        else if (component instanceof JTabbedPane) {
+            JTabbedPane tabbedPane = (JTabbedPane) component;
+            tabbedPane.setBackground(getPanelBackgroundColor());
+            tabbedPane.setForeground(getForegroundColor());
+        }
+        else if (component instanceof JPanel) {
             JPanel panel = (JPanel) component;
 
-            // Apply modern card styling to titled borders
-            if (panel.getBorder() instanceof javax.swing.border.TitledBorder) {
-                javax.swing.border.TitledBorder titledBorder =
-                        (javax.swing.border.TitledBorder) panel.getBorder();
-
-                // Create modern card-style border
+            // Check if it has a titled border
+            if (panel.getBorder() instanceof TitledBorder) {
+                TitledBorder titledBorder = (TitledBorder) panel.getBorder();
                 titledBorder.setBorder(BorderFactory.createCompoundBorder(
                         BorderFactory.createLineBorder(getBorderColor(), 1),
                         BorderFactory.createEmptyBorder(10, 15, 15, 15)
                 ));
                 titledBorder.setTitleFont(getHeadingFont());
                 titledBorder.setTitleColor(getForegroundColor());
-
                 panel.setBackground(getCardBackgroundColor());
-            } else {
-                panel.setBackground(getPanelBackgroundColor());
+            } else if (panel.isOpaque()) {
+                // Only change background if panel is opaque
+                panel.setBackground(getCardBackgroundColor());
             }
-            panel.setForeground(getForegroundColor());
 
-        } else if (component instanceof JTextArea) {
+            panel.setForeground(getForegroundColor());
+        }
+        else if (component instanceof JTextArea) {
             JTextArea textArea = (JTextArea) component;
             textArea.setBackground(getCardBackgroundColor());
             textArea.setForeground(getForegroundColor());
-            textArea.setSelectionColor(getAccentColor());
-            textArea.setSelectedTextColor(Color.WHITE);
-            textArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
             textArea.setCaretColor(getForegroundColor());
-
-        } else if (component instanceof JList) {
+        }
+        else if (component instanceof JTextPane) {
+            JTextPane textPane = (JTextPane) component;
+            textPane.setBackground(getCardBackgroundColor());
+            textPane.setForeground(getForegroundColor());
+            textPane.setCaretColor(getForegroundColor());
+        }
+        else if (component instanceof JTextField) {
+            JTextField textField = (JTextField) component;
+            textField.setBackground(getCardBackgroundColor());
+            textField.setForeground(getForegroundColor());
+            textField.setCaretColor(getForegroundColor());
+        }
+        else if (component instanceof JLabel) {
+            JLabel label = (JLabel) component;
+            // Only update if not already set to a specific color (like white for headers)
+            Color currentColor = label.getForeground();
+            if (currentColor == null ||
+                    (!currentColor.equals(Color.WHITE) &&
+                            !currentColor.equals(new Color(240, 240, 240)))) {
+                label.setForeground(getForegroundColor());
+            }
+        }
+        else if (component instanceof JList) {
             JList<?> list = (JList<?>) component;
             list.setBackground(getCardBackgroundColor());
             list.setForeground(getForegroundColor());
             list.setSelectionBackground(getAccentColor());
             list.setSelectionForeground(Color.WHITE);
-            list.setFont(getBodyFont());
-
-        } else if (component instanceof JTextField) {
-            JTextField textField = (JTextField) component;
-            textField.setBackground(getCardBackgroundColor());
-            textField.setForeground(getForegroundColor());
-            textField.setSelectionColor(getAccentColor());
-            textField.setSelectedTextColor(Color.WHITE);
-            textField.setCaretColor(getForegroundColor());
-            textField.setFont(getBodyFont());
-            textField.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(getBorderColor(), 1),
-                    BorderFactory.createEmptyBorder(8, 12, 8, 12)
-            ));
-
-        } else if (component instanceof JLabel) {
-            JLabel label = (JLabel) component;
-            label.setForeground(getForegroundColor());
-            if (label.getFont().getSize() > 14) {
-                label.setFont(getHeadingFont());
-            } else {
-                label.setFont(getLabelFont());
-            }
-
-        } else if (component instanceof JButton) {
-            // Modern button styling is handled in MainFrame
-
-        } else if (component instanceof JScrollPane) {
-            JScrollPane scrollPane = (JScrollPane) component;
-            scrollPane.getViewport().setBackground(getCardBackgroundColor());
-            scrollPane.setBorder(BorderFactory.createLineBorder(getBorderColor(), 1));
         }
-
-        // Apply to child components
-        if (component instanceof Container) {
-            Container container = (Container) component;
-            for (Component child : container.getComponents()) {
-                applyModernThemeRecursively(child);
+        else if (component instanceof JComboBox) {
+            JComboBox<?> comboBox = (JComboBox<?>) component;
+            comboBox.setBackground(getCardBackgroundColor());
+            comboBox.setForeground(getForegroundColor());
+        }
+        else if (component instanceof JButton) {
+            // Buttons are styled individually, so we skip them here
+            // to avoid overriding their specific styling
+        }
+        else if (component instanceof JScrollPane) {
+            JScrollPane scrollPane = (JScrollPane) component;
+            scrollPane.setBackground(getCardBackgroundColor());
+            scrollPane.getViewport().setBackground(getCardBackgroundColor());
+        }
+        else if (component instanceof JSplitPane) {
+            JSplitPane splitPane = (JSplitPane) component;
+            splitPane.setBackground(getPanelBackgroundColor());
+        }
+        else {
+            // Generic component
+            if (component.isOpaque() && component instanceof JComponent) {
+                component.setBackground(getCardBackgroundColor());
+                component.setForeground(getForegroundColor());
             }
         }
     }

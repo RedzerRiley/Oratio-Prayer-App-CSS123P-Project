@@ -22,6 +22,7 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
 
     // Timer components
     private JLabel timerLabel;
+    private JButton startButton;
     private JButton pauseResumeButton;
     private JButton resetTimerButton;
     private Timer uiUpdateTimer;
@@ -157,8 +158,14 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         timerLabel.setForeground(ThemeService.getInstance().getAccentColor());
         timerPanel.add(timerLabel);
 
+        JButton startButton = new JButton("▶ Start");
+        styleTimerButton(startButton);
+        startButton.addActionListener(e -> startSession());
+        timerPanel.add(startButton);
+
         pauseResumeButton = new JButton("⏸ Pause");
         styleTimerButton(pauseResumeButton);
+        pauseResumeButton.setEnabled(false);
         timerPanel.add(pauseResumeButton);
 
         resetTimerButton = new JButton("↻ Reset Timer");
@@ -248,11 +255,25 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         PrayerTimer timer = rosaryService.getCurrentTimer();
         timerLabel.setText(timer.getFormattedTime());
 
-        // Update pause/resume button text
+        // Update button states
         if (timer.isRunning()) {
             pauseResumeButton.setText("⏸ Pause");
+            pauseResumeButton.setEnabled(true);
+            if (startButton != null) {
+                startButton.setEnabled(false);
+            }
         } else if (timer.isPaused()) {
             pauseResumeButton.setText("▶ Resume");
+            pauseResumeButton.setEnabled(true);
+            if (startButton != null) {
+                startButton.setEnabled(false);
+            }
+        } else {
+            pauseResumeButton.setText("⏸ Pause");
+            pauseResumeButton.setEnabled(false);
+            if (startButton != null) {
+                startButton.setEnabled(true);
+            }
         }
     }
 
@@ -261,11 +282,19 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
 
         if (timer.isRunning()) {
             rosaryService.pausePrayerSession();
-        } else {
+        } else if (timer.isPaused()) {
             rosaryService.resumePrayerSession();
         }
 
         updateTimerDisplay();
+    }
+
+    private void startSession() {
+        if (!sessionActive) {
+            rosaryService.startPrayerSession();
+            sessionActive = true;
+            updateTimerDisplay();
+        }
     }
 
     private void resetTimer() {
@@ -278,6 +307,7 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
 
         if (result == JOptionPane.YES_OPTION) {
             rosaryService.resetPrayerTimer();
+            sessionActive = false;
             updateTimerDisplay();
         }
     }
@@ -316,12 +346,6 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
             currentSteps = rosaryService.getRosarySteps(mystery);
             currentStepIndex = 0;
             displayCurrentStep();
-
-            // Start timer automatically when loading a mystery
-            if (!sessionActive) {
-                rosaryService.startPrayerSession();
-                sessionActive = true;
-            }
         }
     }
 
@@ -359,6 +383,11 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         ThemeService theme = ThemeService.getInstance();
         setBackground(theme.getBackgroundColor());
         theme.applyTheme(this);
+
+        // Reset timer when language changes
+        rosaryService.resetPrayerTimer();
+        sessionActive = false;
+        updateTimerDisplay();
 
         RosaryMystery selectedMystery = (RosaryMystery) mysterySelector.getSelectedItem();
         if (selectedMystery != null) {

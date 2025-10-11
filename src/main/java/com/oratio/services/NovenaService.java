@@ -116,5 +116,8 @@ public class NovenaService {
 
         allNovenas.add(new Novena("st_therese", "St. Thérèse of Lisieux",
                 "Novena to St. Thérèse, the Little Flower, for intercession and roses", 9));
+
+        allNovenas.add(new Novena("st_carlo", "St. Carlo Acutis",
+                "Novena to St. Carlo Acutis, the Patron Saint of programmers ", 9 ));
     }
 }

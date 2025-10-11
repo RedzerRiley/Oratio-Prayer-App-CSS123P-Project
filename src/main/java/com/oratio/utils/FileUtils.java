@@ -376,6 +376,39 @@ public class FileUtils {
                 
                 joyful_mystery_5
                 Ang Pagkakita ni Jesus sa Templo
+                
+                ===
+                
+                apostles_creed
+                Sumasampalataya ako sa Diyos Amang makapangyarihan sa lahat,
+                na may gawa ng langit at lupa.
+                Sumasampalataya naman ako kay Hesukristo,
+                iisang Anak ng Diyos, Panginoon nating lahat.
+                Nagkatawang-tao Siya lalang ng Espiritu Santo,
+                ipinanganak ni Santa Mariang Birhen.
+                Pinagpakasakit ni Poncio Pilato,
+                ipinako sa krus, namatay, at inilibing.
+                Nan descend Siya sa mga patay;
+                muling nabuhay pagkaraan ng tatlong araw.
+                Umakyat sa langit,
+                naupo sa kanan ng Diyos Amang makapangyarihan sa lahat.
+                Doon magmumula ang paririto at huhukom sa mga buhay at mga patay.
+                Sumasampalataya ako sa Diyos Espiritu Santo,
+                sa Banal na Simbahang Katolika,
+                sa kasamahan ng mga banal,
+                sa kapatawaran ng mga kasalanan,
+                sa pagkabuhay ng mga namatay,
+                at sa buhay na walang hanggan.
+                Amen.
+                
+                ===
+                
+                fatima_prayer
+                O Hesus ko, patawarin Mo kami sa aming mga kasalanan,
+                iligtas Mo kami sa apoy ng impiyerno,
+                at ihatid Mo sa langit ang lahat ng kaluluwa,
+                lalo na yaong mga higit na nangangailangan ng Iyong awa.
+                Amen.
                 """;
     }
 
@@ -408,6 +441,41 @@ public class FileUtils {
                 
                 joyful_mystery_5
                 Inventio in Templo
+                
+                
+                ===
+                
+                apostles_creed
+                Credo in Deum Patrem omnipotentem,
+                Creatorem caeli et terrae.
+                Et in Iesum Christum, Filium eius unicum, Dominum nostrum,
+                qui conceptus est de Spiritu Sancto,
+                natus ex Maria Virgine,
+                passus sub Pontio Pilato,
+                crucifixus, mortuus, et sepultus,
+                descendit ad inferos,
+                tertia die resurrexit a mortuis,
+                ascendit ad caelos,
+                sedet ad dexteram Dei Patris omnipotentis,
+                inde venturus est iudicare vivos et mortuos.
+                Credo in Spiritum Sanctum,
+                sanctam Ecclesiam catholicam,
+                sanctorum communionem,
+                remissionem peccatorum,
+                carnis resurrectionem,
+                vitam aeternam.
+                Amen.
+                
+                
+                ===
+                
+                
+                fatima_prayer
+                Domine Iesu, dimitte nobis debita nostra,
+                libera nos ab igne inferni,
+                conduc in caelum omnes animas,
+                praesertim eas quae misericordiae tuae maxime indigent.
+                Amen.
                 """;
     }
 

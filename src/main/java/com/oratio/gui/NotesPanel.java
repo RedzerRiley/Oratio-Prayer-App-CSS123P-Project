@@ -65,7 +65,7 @@ public class NotesPanel extends JPanel {
         notesList.setBackground(ThemeService.getInstance().getCardBackgroundColor());
         notesList.setForeground(ThemeService.getInstance().getForegroundColor());
         notesList.setSelectionBackground(ThemeService.getInstance().getAccentColor());
-        notesList.setSelectionForeground(Color.BLACK);
+        notesList.setSelectionForeground(Color.WHITE);
 
         JScrollPane listScrollPane = new JScrollPane(notesList);
         listScrollPane.setBorder(BorderFactory.createLineBorder(ThemeService.getInstance().getBorderColor()));
@@ -175,7 +175,7 @@ public class NotesPanel extends JPanel {
 
         if (isPrimary) {
             button.setBackground(theme.getAccentColor());
-            button.setForeground(Color.BLACK);
+            button.setForeground(Color.WHITE);
         } else {
             button.setBackground(theme.getBorderColor());
             button.setForeground(theme.getForegroundColor());
@@ -332,11 +332,11 @@ public class NotesPanel extends JPanel {
 
                 JLabel titleLabel = new JLabel(note.getTitle());
                 titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-                titleLabel.setForeground(isSelected ? Color.BLACK : theme.getForegroundColor());
+                titleLabel.setForeground(isSelected ? Color.WHITE : theme.getForegroundColor());
 
                 JLabel categoryLabel = new JLabel(note.getCategory());
                 categoryLabel.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-                categoryLabel.setForeground(isSelected ? Color.DARK_GRAY : theme.getSecondaryTextColor());
+                categoryLabel.setForeground(isSelected ? new Color(240, 240, 240) : theme.getSecondaryTextColor());
 
                 panel.add(titleLabel, BorderLayout.NORTH);
                 panel.add(categoryLabel, BorderLayout.SOUTH);
@@ -352,4 +352,3 @@ public class NotesPanel extends JPanel {
 
     }
 }
-
