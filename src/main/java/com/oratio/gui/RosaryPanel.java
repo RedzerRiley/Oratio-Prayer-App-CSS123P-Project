@@ -148,7 +148,7 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         JPanel timerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         timerPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
 
-        JLabel timerIconLabel = new JLabel("⏱ ");
+        JLabel timerIconLabel = new JLabel(" ");
         timerIconLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         timerIconLabel.setForeground(ThemeService.getInstance().getForegroundColor());
         timerPanel.add(timerIconLabel);
@@ -158,17 +158,17 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         timerLabel.setForeground(ThemeService.getInstance().getAccentColor());
         timerPanel.add(timerLabel);
 
-        JButton startButton = new JButton("▶ Start");
+        JButton startButton = new JButton("Start");
         styleTimerButton(startButton);
         startButton.addActionListener(e -> startSession());
         timerPanel.add(startButton);
 
-        pauseResumeButton = new JButton("⏸ Pause");
+        pauseResumeButton = new JButton(" Pause");
         styleTimerButton(pauseResumeButton);
         pauseResumeButton.setEnabled(false);
         timerPanel.add(pauseResumeButton);
 
-        resetTimerButton = new JButton("↻ Reset Timer");
+        resetTimerButton = new JButton(" Reset Timer");
         styleTimerButton(resetTimerButton);
         timerPanel.add(resetTimerButton);
 
@@ -257,19 +257,19 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
 
         // Update button states
         if (timer.isRunning()) {
-            pauseResumeButton.setText("⏸ Pause");
+            pauseResumeButton.setText("Pause");
             pauseResumeButton.setEnabled(true);
             if (startButton != null) {
                 startButton.setEnabled(false);
             }
         } else if (timer.isPaused()) {
-            pauseResumeButton.setText("▶ Resume");
+            pauseResumeButton.setText("Resume");
             pauseResumeButton.setEnabled(true);
             if (startButton != null) {
                 startButton.setEnabled(false);
             }
         } else {
-            pauseResumeButton.setText("⏸ Pause");
+            pauseResumeButton.setText("Pause");
             pauseResumeButton.setEnabled(false);
             if (startButton != null) {
                 startButton.setEnabled(true);

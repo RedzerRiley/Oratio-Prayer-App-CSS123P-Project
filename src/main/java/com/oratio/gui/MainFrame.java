@@ -23,6 +23,7 @@ public class MainFrame extends JFrame {
     private JPanel headerPanel;
     private JComboBox<String> languageSelector;
     private JToggleButton darkModeToggle;
+    private MusicControlPanel musicControlPanel;
 
     private PrayersPanel prayersPanel;
     private RosaryPanel rosaryPanel;
@@ -95,15 +96,14 @@ public class MainFrame extends JFrame {
         SwingUtilities.invokeLater(this::applyThemeToAllComponents);
     }
 
-    /**
-     * Creates the modern header panel - always Catholic Blue regardless of theme
-     */
+    // In your MainFrame.java, update the createModernHeader() method:
+
     private JPanel createModernHeader() {
         JPanel header = new JPanel();
         header.setLayout(new BorderLayout());
         header.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
         header.setBackground(CATHOLIC_BLUE);
-        header.setPreferredSize(new Dimension(getWidth(), 90));
+        header.setPreferredSize(new Dimension(getWidth(), 100));
 
         // Left side - Logo and app name
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
@@ -111,6 +111,22 @@ public class MainFrame extends JFrame {
 
         JPanel logoPanel = createLogoPanel();
         leftPanel.add(logoPanel);
+
+        // Center - Music controls
+        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        centerPanel.setOpaque(false);
+
+        try {
+            musicControlPanel = new MusicControlPanel();
+            centerPanel.add(musicControlPanel);
+        } catch (Exception e) {
+            // If music control fails to load, show error message
+            JLabel errorLabel = new JLabel("Music controls unavailable");
+            errorLabel.setForeground(Color.WHITE);
+            errorLabel.setFont(new Font("Segoe UI", Font.ITALIC, 10));
+            centerPanel.add(errorLabel);
+            System.err.println("Failed to initialize music controls: " + e.getMessage());
+        }
 
         // Right side - Controls
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
@@ -137,11 +153,11 @@ public class MainFrame extends JFrame {
         rightPanel.add(languageSelector);
 
         header.add(leftPanel, BorderLayout.WEST);
+        header.add(centerPanel, BorderLayout.CENTER);
         header.add(rightPanel, BorderLayout.EAST);
 
         return header;
     }
-
     /**
      * Creates the modern sidebar navigation
      */
@@ -165,11 +181,11 @@ public class MainFrame extends JFrame {
         sidebar.add(navTitle);
 
         // Navigation buttons
-        JButton prayersBtn = createNavButton("🙏", "Daily Prayers", true);
-        JButton rosaryBtn = createNavButton("📿", "Rosary", false);
-        JButton psalmsBtn = createNavButton("📖", "Psalms", false);
-        JButton novenasBtn = createNavButton("✨", "Novenas", false);
-        JButton notesBtn = createNavButton("📝", "Notes", false);
+        JButton prayersBtn = createNavButton("", "Daily Prayers", true);
+        JButton rosaryBtn = createNavButton("", "Rosary", false);
+        JButton psalmsBtn = createNavButton("", "Psalms", false);
+        JButton novenasBtn = createNavButton("", "Novenas", false);
+        JButton notesBtn = createNavButton("", "Notes", false);
 
         sidebar.add(prayersBtn);
         sidebar.add(Box.createVerticalStrut(5));
