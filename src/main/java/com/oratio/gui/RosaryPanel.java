@@ -18,7 +18,8 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
     private JButton previousButton;
     private JButton nextButton;
     private JButton resetButton;
-    private JComboBox<RosaryMystery> mysterySelector;
+    private JLabel beadImageLabel;
+    private JLabel todayLabel;
 
     // Timer components
     private JLabel timerLabel;
@@ -32,6 +33,7 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
     private LanguageService languageService;
     private List<RosaryStep> currentSteps;
     private int currentStepIndex = 0;
+    private RosaryMystery currentMystery;
 
     public RosaryPanel() {
         initializeServices();
@@ -48,138 +50,217 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
     }
 
     private void initializeGUI() {
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout(15, 15));
         setBackground(ThemeService.getInstance().getBackgroundColor());
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Top panel for mystery selection and timer
-        JPanel topPanel = new JPanel(new BorderLayout(0, 10));
-        topPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
-        topPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ThemeService.getInstance().getBorderColor()),
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        // Left panel for bead visualization
+        JPanel leftPanel = createBeadVisualizationPanel();
+        add(leftPanel, BorderLayout.WEST);
+
+        // Center panel for main content
+        JPanel centerPanel = createMainContentPanel();
+        add(centerPanel, BorderLayout.CENTER);
+
+        // Bottom panel for navigation
+        JPanel bottomPanel = createNavigationPanel();
+        add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    private JPanel createBeadVisualizationPanel() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ThemeService.getInstance().getBorderColor(), 2),
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)
         ));
-        topPanel.setPreferredSize(new Dimension(0, 140));
+        panel.setPreferredSize(new Dimension(280, 0));
 
-        JPanel selectorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        selectorPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
+        // Title for bead panel
+        JLabel beadPanelTitle = new JLabel("Current Bead");
+        beadPanelTitle.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        beadPanelTitle.setForeground(ThemeService.getInstance().getForegroundColor());
+        beadPanelTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(beadPanelTitle, BorderLayout.NORTH);
 
-        JLabel selectorLabel = new JLabel("Mystery: ");
-        selectorLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        selectorLabel.setForeground(ThemeService.getInstance().getForegroundColor());
-        selectorPanel.add(selectorLabel);
+        // Image placeholder for rosary bead
+        beadImageLabel = new JLabel();
+        beadImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        beadImageLabel.setVerticalAlignment(SwingConstants.CENTER);
+        beadImageLabel.setPreferredSize(new Dimension(240, 240));
+        beadImageLabel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ThemeService.getInstance().getBorderColor(), 1),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
+        beadImageLabel.setOpaque(true);
+        beadImageLabel.setBackground(ThemeService.getInstance().getBackgroundColor());
 
-        mysterySelector = new JComboBox<>(rosaryService.getAllMysteries().toArray(new RosaryMystery[0]));
-        styleComboBox(mysterySelector);
-        selectorPanel.add(mysterySelector);
+        // Placeholder text
+        JPanel imagePlaceholder = new JPanel(new BorderLayout());
+        imagePlaceholder.setBackground(ThemeService.getInstance().getBackgroundColor());
+        JLabel placeholderText = new JLabel("<html><center>Bead Image<br/>Placeholder<br/><br/><small>Add your image here</small></center></html>");
+        placeholderText.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        placeholderText.setForeground(ThemeService.getInstance().getForegroundColor());
+        placeholderText.setHorizontalAlignment(SwingConstants.CENTER);
+        imagePlaceholder.add(placeholderText, BorderLayout.CENTER);
+        beadImageLabel.setLayout(new BorderLayout());
+        beadImageLabel.add(imagePlaceholder, BorderLayout.CENTER);
+
+        panel.add(beadImageLabel, BorderLayout.CENTER);
+
+        // Info text
+        JLabel infoLabel = new JLabel("<html><center><small>Visual guide for<br/>current prayer step</small></center></html>");
+        infoLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        infoLabel.setForeground(ThemeService.getInstance().getForegroundColor());
+        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        infoLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+        panel.add(infoLabel, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private JPanel createMainContentPanel() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(ThemeService.getInstance().getBackgroundColor());
+
+        // Top section with mystery and timer
+        JPanel topSection = new JPanel(new BorderLayout(10, 10));
+        topSection.setBackground(ThemeService.getInstance().getCardBackgroundColor());
+        topSection.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ThemeService.getInstance().getBorderColor(), 2),
+                BorderFactory.createEmptyBorder(20, 25, 20, 25)
+        ));
+
+        // Today's mystery header
+        JPanel mysteryHeaderPanel = new JPanel(new BorderLayout(10, 5));
+        mysteryHeaderPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
+
+        todayLabel = new JLabel("Today's Mystery");
+        todayLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        todayLabel.setForeground(ThemeService.getInstance().getForegroundColor());
+        mysteryHeaderPanel.add(todayLabel, BorderLayout.NORTH);
 
         mysteryLabel = new JLabel();
-        mysteryLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        mysteryLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        mysteryLabel.setForeground(ThemeService.getInstance().getForegroundColor());
+        mysteryLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        mysteryLabel.setForeground(ThemeService.getInstance().getAccentColor());
+        mysteryHeaderPanel.add(mysteryLabel, BorderLayout.CENTER);
+
+        topSection.add(mysteryHeaderPanel, BorderLayout.NORTH);
 
         // Timer panel
         JPanel timerPanel = createTimerPanel();
+        topSection.add(timerPanel, BorderLayout.CENTER);
 
-        topPanel.add(selectorPanel, BorderLayout.NORTH);
-        topPanel.add(mysteryLabel, BorderLayout.CENTER);
-        topPanel.add(timerPanel, BorderLayout.SOUTH);
-        add(topPanel, BorderLayout.NORTH);
+        panel.add(topSection, BorderLayout.NORTH);
 
-        // Center panel for step content
-        JPanel centerPanel = new JPanel(new BorderLayout(0, 10));
-        centerPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
-        centerPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ThemeService.getInstance().getBorderColor()),
-                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        // Prayer content section
+        JPanel contentSection = new JPanel(new BorderLayout(10, 10));
+        contentSection.setBackground(ThemeService.getInstance().getCardBackgroundColor());
+        contentSection.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(ThemeService.getInstance().getBorderColor(), 2),
+                BorderFactory.createEmptyBorder(20, 25, 20, 25)
         ));
 
-        JLabel centerTitle = new JLabel("Prayer Guide");
-        centerTitle.setFont(ThemeService.getInstance().getHeadingFont());
-        centerTitle.setForeground(ThemeService.getInstance().getForegroundColor());
-        centerPanel.add(centerTitle, BorderLayout.NORTH);
-
+        // Step counter
         stepCounterLabel = new JLabel();
-        stepCounterLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        stepCounterLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        stepCounterLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
         stepCounterLabel.setForeground(ThemeService.getInstance().getAccentColor());
-        stepCounterLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        stepCounterLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        stepCounterLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
+        contentSection.add(stepCounterLabel, BorderLayout.NORTH);
 
-        JPanel stepPanel = new JPanel(new BorderLayout());
-        stepPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
-        stepPanel.add(stepCounterLabel, BorderLayout.NORTH);
-
+        // Prayer text area
         stepTextArea = new JTextArea();
         stepTextArea.setEditable(false);
         stepTextArea.setWrapStyleWord(true);
         stepTextArea.setLineWrap(true);
-        stepTextArea.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        stepTextArea.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         stepTextArea.setBackground(ThemeService.getInstance().getCardBackgroundColor());
         stepTextArea.setForeground(ThemeService.getInstance().getForegroundColor());
         stepTextArea.setCaretColor(ThemeService.getInstance().getForegroundColor());
-        stepTextArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        stepTextArea.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         JScrollPane scrollPane = new JScrollPane(stepTextArea);
         scrollPane.setBorder(BorderFactory.createLineBorder(ThemeService.getInstance().getBorderColor()));
-        stepPanel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setPreferredSize(new Dimension(0, 350));
+        contentSection.add(scrollPane, BorderLayout.CENTER);
 
-        centerPanel.add(stepPanel, BorderLayout.CENTER);
-        add(centerPanel, BorderLayout.CENTER);
+        panel.add(contentSection, BorderLayout.CENTER);
 
-        // Bottom panel for navigation
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
-        bottomPanel.setBackground(ThemeService.getInstance().getBackgroundColor());
-
-        previousButton = new JButton("Previous");
-        resetButton = new JButton("Reset");
-        nextButton = new JButton("Next");
-
-        styleButton(previousButton, false);
-        styleButton(resetButton, false);
-        styleButton(nextButton, true);
-
-        bottomPanel.add(previousButton);
-        bottomPanel.add(resetButton);
-        bottomPanel.add(nextButton);
-
-        add(bottomPanel, BorderLayout.SOUTH);
+        return panel;
     }
 
     private JPanel createTimerPanel() {
-        JPanel timerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        JPanel timerPanel = new JPanel();
+        timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.Y_AXIS));
         timerPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
+        timerPanel.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
 
-        JLabel timerIconLabel = new JLabel(" ");
-        timerIconLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        timerIconLabel.setForeground(ThemeService.getInstance().getForegroundColor());
-        timerPanel.add(timerIconLabel);
+        // Timer display
+        JPanel timerDisplayPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        timerDisplayPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
+
+        JLabel timerIcon = new JLabel("⏱");
+        timerIcon.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+        timerDisplayPanel.add(timerIcon);
 
         timerLabel = new JLabel("00:00");
-        timerLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        timerLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         timerLabel.setForeground(ThemeService.getInstance().getAccentColor());
-        timerPanel.add(timerLabel);
+        timerDisplayPanel.add(timerLabel);
 
-        JButton startButton = new JButton("Start");
-        styleTimerButton(startButton);
+        timerPanel.add(timerDisplayPanel);
+
+        // Timer buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        buttonPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
+
+        startButton = new JButton("▶ Start");
+        styleTimerButton(startButton, true);
         startButton.addActionListener(e -> startSession());
-        timerPanel.add(startButton);
+        buttonPanel.add(startButton);
 
-        pauseResumeButton = new JButton(" Pause");
-        styleTimerButton(pauseResumeButton);
+        pauseResumeButton = new JButton("⏸ Pause");
+        styleTimerButton(pauseResumeButton, false);
         pauseResumeButton.setEnabled(false);
-        timerPanel.add(pauseResumeButton);
+        buttonPanel.add(pauseResumeButton);
 
-        resetTimerButton = new JButton(" Reset Timer");
-        styleTimerButton(resetTimerButton);
-        timerPanel.add(resetTimerButton);
+        resetTimerButton = new JButton("⟳ Reset");
+        styleTimerButton(resetTimerButton, false);
+        buttonPanel.add(resetTimerButton);
+
+        timerPanel.add(buttonPanel);
 
         return timerPanel;
     }
 
-    private void styleButton(JButton button, boolean isPrimary) {
+    private JPanel createNavigationPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
+        panel.setBackground(ThemeService.getInstance().getBackgroundColor());
+
+        previousButton = new JButton("← Previous");
+        resetButton = new JButton("⟳ Reset");
+        nextButton = new JButton("Next →");
+
+        styleNavigationButton(previousButton, false);
+        styleNavigationButton(resetButton, false);
+        styleNavigationButton(nextButton, true);
+
+        panel.add(previousButton);
+        panel.add(resetButton);
+        panel.add(nextButton);
+
+        return panel;
+    }
+
+    private void styleNavigationButton(JButton button, boolean isPrimary) {
         ThemeService theme = ThemeService.getInstance();
-        button.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setBorderPainted(false);
         button.setFocusPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setContentAreaFilled(true);
+        button.setOpaque(true);
 
         if (isPrimary) {
             button.setBackground(theme.getAccentColor());
@@ -189,34 +270,53 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
             button.setForeground(theme.getForegroundColor());
         }
 
-        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        button.setBorder(BorderFactory.createEmptyBorder(12, 30, 12, 30));
+
+        // Store original colors
+        Color originalBg = isPrimary ? theme.getAccentColor() : theme.getBorderColor();
+        Color hoverBg = isPrimary ? theme.getAccentColor().darker() : theme.getBorderColor().darker();
+
+        // Remove all existing mouse listeners to avoid duplicates
+        for (java.awt.event.MouseListener ml : button.getMouseListeners()) {
+            if (ml instanceof java.awt.event.MouseAdapter) {
+                button.removeMouseListener(ml);
+            }
+        }
+
+        // Hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                if (button.isEnabled()) {
+                    button.setBackground(hoverBg);
+                }
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                if (button.isEnabled()) {
+                    button.setBackground(originalBg);
+                }
+            }
+        });
     }
 
-    private void styleTimerButton(JButton button) {
+    private void styleTimerButton(JButton button, boolean isPrimary) {
         ThemeService theme = ThemeService.getInstance();
-        button.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
         button.setBorderPainted(false);
         button.setFocusPainted(false);
-        button.setBackground(theme.getBorderColor());
-        button.setForeground(theme.getForegroundColor());
-        button.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
-    }
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-    private void styleComboBox(JComboBox<?> comboBox) {
-        ThemeService theme = ThemeService.getInstance();
-        comboBox.setBackground(theme.getCardBackgroundColor());
-        comboBox.setForeground(theme.getForegroundColor());
-        comboBox.setBorder(BorderFactory.createLineBorder(theme.getBorderColor()));
+        if (isPrimary) {
+            button.setBackground(theme.getAccentColor());
+            button.setForeground(Color.WHITE);
+        } else {
+            button.setBackground(theme.getBorderColor());
+            button.setForeground(theme.getForegroundColor());
+        }
+
+        button.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
     }
 
     private void setupEventHandlers() {
-        mysterySelector.addActionListener(e -> {
-            RosaryMystery selectedMystery = (RosaryMystery) mysterySelector.getSelectedItem();
-            if (selectedMystery != null) {
-                loadMystery(selectedMystery);
-            }
-        });
-
         previousButton.addActionListener(e -> {
             if (currentStepIndex > 0) {
                 currentStepIndex--;
@@ -257,23 +357,17 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
 
         // Update button states
         if (timer.isRunning()) {
-            pauseResumeButton.setText("Pause");
+            pauseResumeButton.setText("⏸ Pause");
             pauseResumeButton.setEnabled(true);
-            if (startButton != null) {
-                startButton.setEnabled(false);
-            }
+            startButton.setEnabled(false);
         } else if (timer.isPaused()) {
-            pauseResumeButton.setText("Resume");
+            pauseResumeButton.setText("▶ Resume");
             pauseResumeButton.setEnabled(true);
-            if (startButton != null) {
-                startButton.setEnabled(false);
-            }
+            startButton.setEnabled(false);
         } else {
-            pauseResumeButton.setText("Pause");
+            pauseResumeButton.setText("⏸ Pause");
             pauseResumeButton.setEnabled(false);
-            if (startButton != null) {
-                startButton.setEnabled(true);
-            }
+            startButton.setEnabled(true);
         }
     }
 
@@ -325,22 +419,21 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(
                     this,
-                    "Rosary session completed!\n\nTotal prayer time: " + formattedDuration,
+                    "Rosary completed! 🙏\n\nTotal prayer time: " + formattedDuration,
                     "Session Complete",
                     JOptionPane.INFORMATION_MESSAGE
             );
-            // Timer stays paused at final time, showing the total duration
         });
     }
 
     private void loadTodaysMystery() {
-        RosaryMystery todaysMystery = rosaryService.getTodaysMystery();
-        mysterySelector.setSelectedItem(todaysMystery);
-        loadMystery(todaysMystery);
+        currentMystery = rosaryService.getTodaysMystery();
+        loadMystery(currentMystery);
     }
 
     private void loadMystery(RosaryMystery mystery) {
         if (mystery != null) {
+            currentMystery = mystery;
             String currentLanguage = languageService.getCurrentLanguage();
             mysteryLabel.setText(rosaryService.getMysteryTitle(mystery, currentLanguage));
             currentSteps = rosaryService.getRosarySteps(mystery);
@@ -363,18 +456,108 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
             stepTextArea.setText(stepText);
             stepTextArea.setCaretPosition(0);
 
+            // Update bead image based on step
+            updateBeadImage(step);
+
             previousButton.setEnabled(currentStepIndex > 0);
 
-            // On last step, enable finish button
+            // On last step, change button to Finish
             if (currentStepIndex == currentSteps.size() - 1) {
                 nextButton.setEnabled(true);
-                nextButton.setText("Finish");
-                styleButton(nextButton, true);
+                if (!nextButton.getText().equals("✓ Finish")) {
+                    nextButton.setText("✓ Finish");
+                    styleNavigationButton(nextButton, true);
+                }
             } else {
                 nextButton.setEnabled(true);
-                nextButton.setText("Next");
-                styleButton(nextButton, true);
+                if (!nextButton.getText().equals("Next →")) {
+                    nextButton.setText("Next →");
+                    styleNavigationButton(nextButton, true);
+                }
             }
+        }
+    }
+
+
+
+    private void updateBeadImage(RosaryStep step) {
+        String stepId = step.getId();
+        String imagePath = getBeadImagePath(stepId);
+
+        beadImageLabel.removeAll();
+        beadImageLabel.setLayout(new BorderLayout());
+
+        try {
+            // Try to load the image from resources
+            java.net.URL imageUrl = getClass().getResource(imagePath);
+
+            if (imageUrl != null) {
+                ImageIcon originalIcon = new ImageIcon(imageUrl);
+                // Scale image to fit the label while maintaining aspect ratio
+                Image scaledImage = originalIcon.getImage().getScaledInstance(220, 220, Image.SCALE_SMOOTH);
+                ImageIcon scaledIcon = new ImageIcon(scaledImage);
+
+                JLabel imageLabel = new JLabel(scaledIcon);
+                imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                beadImageLabel.add(imageLabel, BorderLayout.CENTER);
+            } else {
+                // Show placeholder if image not found
+                showImagePlaceholder(stepId, imagePath);
+            }
+        } catch (Exception e) {
+            // Show placeholder on error
+            showImagePlaceholder(stepId, imagePath);
+        }
+
+        beadImageLabel.revalidate();
+        beadImageLabel.repaint();
+    }
+
+    private void showImagePlaceholder(String stepId, String imagePath) {
+        JPanel placeholder = new JPanel(new BorderLayout());
+        placeholder.setBackground(ThemeService.getInstance().getBackgroundColor());
+
+        JLabel placeholderText = new JLabel("<html><center><b>" + getBeadType(stepId) + "</b><br/><br/>Image Placeholder<br/><small>" + imagePath + "</small></center></html>");
+        placeholderText.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        placeholderText.setForeground(ThemeService.getInstance().getForegroundColor());
+        placeholderText.setHorizontalAlignment(SwingConstants.CENTER);
+        placeholder.add(placeholderText, BorderLayout.CENTER);
+
+        beadImageLabel.add(placeholder, BorderLayout.CENTER);
+    }
+
+    private String getBeadImagePath(String stepId) {
+        // Map step IDs to image file paths
+        // Customize these paths based on your image naming convention
+        if (stepId.contains("sign_cross")) {
+            return "/images/beads/crucifix.png";
+        } else if (stepId.contains("our_father")) {
+            return "/images/beads/our_father_bead.png";
+        } else if (stepId.contains("hail_mary")) {
+            return "/images/beads/hail_mary_bead.png";
+        } else if (stepId.contains("glory_be")) {
+            return "/images/beads/glory_be_bead.png";
+        } else if (stepId.contains("mystery")) {
+            return "/images/beads/mystery_bead.png";
+        } else {
+            return "/images/beads/default_bead.png";
+        }
+    }
+
+    private String getBeadType(String stepId) {
+        // Return user-friendly bead type names
+        if (stepId.contains("sign_cross")) {
+            return "Crucifix";
+        } else if (stepId.contains("our_father")) {
+            return "Our Father Bead";
+        } else if (stepId.contains("hail_mary")) {
+            return "Hail Mary Bead";
+        } else if (stepId.contains("glory_be")) {
+            return "Glory Be";
+        } else if (stepId.contains("mystery")) {
+            return "Mystery Meditation";
+        } else {
+            return "Prayer Bead";
         }
     }
 
@@ -389,9 +572,9 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         sessionActive = false;
         updateTimerDisplay();
 
-        RosaryMystery selectedMystery = (RosaryMystery) mysterySelector.getSelectedItem();
-        if (selectedMystery != null) {
-            loadMystery(selectedMystery);
+        // Reload current mystery
+        if (currentMystery != null) {
+            loadMystery(currentMystery);
         }
     }
 
