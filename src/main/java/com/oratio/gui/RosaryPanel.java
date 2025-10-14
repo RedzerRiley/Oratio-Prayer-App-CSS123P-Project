@@ -200,9 +200,6 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         JPanel timerDisplayPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         timerDisplayPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
 
-        JLabel timerIcon = new JLabel("⏱");
-        timerIcon.setFont(new Font("Segoe UI", Font.PLAIN, 20));
-        timerDisplayPanel.add(timerIcon);
 
         timerLabel = new JLabel("00:00");
         timerLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
@@ -215,17 +212,17 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
 
-        startButton = new JButton("▶ Start");
+        startButton = new JButton("Start");
         styleTimerButton(startButton, true);
         startButton.addActionListener(e -> startSession());
         buttonPanel.add(startButton);
 
-        pauseResumeButton = new JButton("⏸ Pause");
+        pauseResumeButton = new JButton("Pause");
         styleTimerButton(pauseResumeButton, false);
         pauseResumeButton.setEnabled(false);
         buttonPanel.add(pauseResumeButton);
 
-        resetTimerButton = new JButton("⟳ Reset");
+        resetTimerButton = new JButton("Reset");
         styleTimerButton(resetTimerButton, false);
         buttonPanel.add(resetTimerButton);
 
@@ -238,9 +235,9 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
         panel.setBackground(ThemeService.getInstance().getBackgroundColor());
 
-        previousButton = new JButton("← Previous");
-        resetButton = new JButton("⟳ Reset");
-        nextButton = new JButton("Next →");
+        previousButton = new JButton("Previous");
+        resetButton = new JButton("Reset");
+        nextButton = new JButton("Next");
 
         styleNavigationButton(previousButton, false);
         styleNavigationButton(resetButton, false);
@@ -357,15 +354,15 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
 
         // Update button states
         if (timer.isRunning()) {
-            pauseResumeButton.setText("⏸ Pause");
+            pauseResumeButton.setText("Pause");
             pauseResumeButton.setEnabled(true);
             startButton.setEnabled(false);
         } else if (timer.isPaused()) {
-            pauseResumeButton.setText("▶ Resume");
+            pauseResumeButton.setText("Resume");
             pauseResumeButton.setEnabled(true);
             startButton.setEnabled(false);
         } else {
-            pauseResumeButton.setText("⏸ Pause");
+            pauseResumeButton.setText("Pause");
             pauseResumeButton.setEnabled(false);
             startButton.setEnabled(true);
         }
@@ -419,7 +416,7 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(
                     this,
-                    "Rosary completed! 🙏\n\nTotal prayer time: " + formattedDuration,
+                    "Rosary completed! \n\nTotal prayer time: " + formattedDuration,
                     "Session Complete",
                     JOptionPane.INFORMATION_MESSAGE
             );
@@ -464,8 +461,8 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
             // On last step, change button to Finish
             if (currentStepIndex == currentSteps.size() - 1) {
                 nextButton.setEnabled(true);
-                if (!nextButton.getText().equals("✓ Finish")) {
-                    nextButton.setText("✓ Finish");
+                if (!nextButton.getText().equals("Finish")) {
+                    nextButton.setText("Finish");
                     styleNavigationButton(nextButton, true);
                 }
             } else {

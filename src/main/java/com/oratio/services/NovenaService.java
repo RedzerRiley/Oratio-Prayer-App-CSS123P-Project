@@ -96,6 +96,9 @@ public class NovenaService {
         allNovenas.add(new Novena("sacred_heart", "Sacred Heart of Jesus",
                 "A powerful novena to the Sacred Heart of Jesus for spiritual and temporal needs", 9));
 
+        allNovenas.add(new Novena("st_carlo", "St. Carlo Acutis",
+                "Novena to St. Carlo Acutis, the Patron Saint of programmers ", 9 ));
+
         allNovenas.add(new Novena("perpetual_help", "Our Lady of Perpetual Help",
                 "Novena to Our Lady of Perpetual Help for intercession and protection", 9));
 
@@ -117,7 +120,6 @@ public class NovenaService {
         allNovenas.add(new Novena("st_therese", "St. Thérèse of Lisieux",
                 "Novena to St. Thérèse, the Little Flower, for intercession and roses", 9));
 
-        allNovenas.add(new Novena("st_carlo", "St. Carlo Acutis",
-                "Novena to St. Carlo Acutis, the Patron Saint of programmers ", 9 ));
+
     }
 }
