@@ -200,7 +200,6 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         JPanel timerDisplayPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         timerDisplayPanel.setBackground(ThemeService.getInstance().getCardBackgroundColor());
 
-
         timerLabel = new JLabel("00:00");
         timerLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         timerLabel.setForeground(ThemeService.getInstance().getAccentColor());
@@ -416,7 +415,7 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(
                     this,
-                    "Rosary completed! \n\nTotal prayer time: " + formattedDuration,
+                    "Rosary completed!\n\nTotal prayer time: " + formattedDuration,
                     "Session Complete",
                     JOptionPane.INFORMATION_MESSAGE
             );
@@ -467,8 +466,8 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
                 }
             } else {
                 nextButton.setEnabled(true);
-                if (!nextButton.getText().equals("Next →")) {
-                    nextButton.setText("Next →");
+                if (!nextButton.getText().equals("Next")) {
+                    nextButton.setText("Next");
                     styleNavigationButton(nextButton, true);
                 }
             }
@@ -524,35 +523,142 @@ public class RosaryPanel extends JPanel implements RosaryService.PrayerSessionLi
     }
 
     private String getBeadImagePath(String stepId) {
-        // Map step IDs to image file paths
-        // Customize these paths based on your image naming convention
-        if (stepId.contains("sign_cross")) {
-            return "/images/beads/crucifix.png";
-        } else if (stepId.contains("our_father")) {
-            return "/images/beads/our_father_bead.png";
-        } else if (stepId.contains("hail_mary")) {
-            return "/images/beads/hail_mary_bead.png";
-        } else if (stepId.contains("glory_be")) {
-            return "/images/beads/glory_be_bead.png";
-        } else if (stepId.contains("mystery")) {
-            return "/images/beads/mystery_bead.png";
-        } else {
-            return "/images/beads/default_bead.png";
+        // Map step IDs to image file paths with specific images for each step
+
+        // Sign of the Cross
+        if (stepId.equals("sign_cross") || stepId.equals("sign_cross_final")) {
+            return "/images/beads/sign_cross.png";
         }
+
+        // Apostles' Creed
+        if (stepId.equals("apostles_creed")) {
+            return "/images/beads/apostles_creed.png";
+        }
+
+        // Our Father beads (6 total: 1 initial + 5 decades)
+        if (stepId.equals("our_father_1")) {
+            return "/images/beads/our_father_1.png";
+        } else if (stepId.equals("our_father_2")) {
+            return "/images/beads/our_father_2.png";
+        } else if (stepId.equals("our_father_3")) {
+            return "/images/beads/our_father_3.png";
+        } else if (stepId.equals("our_father_4")) {
+            return "/images/beads/our_father_4.png";
+        } else if (stepId.equals("our_father_5")) {
+            return "/images/beads/our_father_5.png";
+        } else if (stepId.equals("our_father_6")) {
+            return "/images/beads/our_father_6.png";
+        }
+
+        // First three Hail Marys (Faith, Hope, Charity)
+        if (stepId.equals("hail_mary_1")) {
+            return "/images/beads/hail_mary_faith.png";
+        } else if (stepId.equals("hail_mary_2")) {
+            return "/images/beads/hail_mary_hope.png";
+        } else if (stepId.equals("hail_mary_3")) {
+            return "/images/beads/hail_mary_charity.png";
+        }
+
+        // Hail Mary decades (10 beads for each of 5 decades = 50 images)
+        if (stepId.equals("hail_mary_decade_1")) {
+            return "/images/beads/hail_mary_decade_1_step_1.png";
+        } else if (stepId.equals("hail_mary_decade_2")) {
+            return "/images/beads/hail_mary_decade_2_step_1.png";
+        } else if (stepId.equals("hail_mary_decade_3")) {
+            return "/images/beads/hail_mary_decade_3_step_1.png";
+        } else if (stepId.equals("hail_mary_decade_4")) {
+            return "/images/beads/hail_mary_decade_4_step_1.png";
+        } else if (stepId.equals("hail_mary_decade_5")) {
+            return "/images/beads/hail_mary_decade_5_step_1.png";
+        }
+
+        // Glory Be (6 total: 1 initial + 5 decades)
+        if (stepId.equals("glory_be_1")) {
+            return "/images/beads/glory_be_1.png";
+        } else if (stepId.equals("glory_be_2")) {
+            return "/images/beads/glory_be_2.png";
+        } else if (stepId.equals("glory_be_3")) {
+            return "/images/beads/glory_be_3.png";
+        } else if (stepId.equals("glory_be_4")) {
+            return "/images/beads/glory_be_4.png";
+        } else if (stepId.equals("glory_be_5")) {
+            return "/images/beads/glory_be_5.png";
+        } else if (stepId.equals("glory_be_6")) {
+            return "/images/beads/glory_be_6.png";
+        }
+
+        // Fatima Prayer (5 total: one for each decade)
+        if (stepId.equals("fatima_prayer_1")) {
+            return "/images/beads/fatima_prayer_1.png";
+        } else if (stepId.equals("fatima_prayer_2")) {
+            return "/images/beads/fatima_prayer_2.png";
+        } else if (stepId.equals("fatima_prayer_3")) {
+            return "/images/beads/fatima_prayer_3.png";
+        } else if (stepId.equals("fatima_prayer_4")) {
+            return "/images/beads/fatima_prayer_4.png";
+        } else if (stepId.equals("fatima_prayer_5")) {
+            return "/images/beads/fatima_prayer_5.png";
+        }
+
+        // Mystery meditations (5 mysteries per set)
+        if (stepId.equals("mystery_1")) {
+            return "/images/beads/mystery_1.png";
+        } else if (stepId.equals("mystery_2")) {
+            return "/images/beads/mystery_2.png";
+        } else if (stepId.equals("mystery_3")) {
+            return "/images/beads/mystery_3.png";
+        } else if (stepId.equals("mystery_4")) {
+            return "/images/beads/mystery_4.png";
+        } else if (stepId.equals("mystery_5")) {
+            return "/images/beads/mystery_5.png";
+        }
+
+        // Hail Holy Queen
+        if (stepId.equals("hail_holy_queen")) {
+            return "/images/beads/hail_holy_queen.png";
+        }
+
+        // Final Prayer
+        if (stepId.equals("final_prayer")) {
+            return "/images/beads/final_prayer.png";
+        }
+
+        // Default fallback
+        return "/images/beads/default_bead.png";
     }
 
     private String getBeadType(String stepId) {
-        // Return user-friendly bead type names
-        if (stepId.contains("sign_cross")) {
-            return "Crucifix";
-        } else if (stepId.contains("our_father")) {
-            return "Our Father Bead";
-        } else if (stepId.contains("hail_mary")) {
-            return "Hail Mary Bead";
-        } else if (stepId.contains("glory_be")) {
-            return "Glory Be";
-        } else if (stepId.contains("mystery")) {
-            return "Mystery Meditation";
+        // Return user-friendly bead type names for each specific step
+
+        if (stepId.equals("sign_cross") || stepId.equals("sign_cross_final")) {
+            return "Sign of the Cross";
+        } else if (stepId.equals("apostles_creed")) {
+            return "Apostles' Creed";
+        } else if (stepId.startsWith("our_father_")) {
+            String num = stepId.replace("our_father_", "");
+            return "Our Father #" + num;
+        } else if (stepId.equals("hail_mary_1")) {
+            return "Hail Mary (Faith)";
+        } else if (stepId.equals("hail_mary_2")) {
+            return "Hail Mary (Hope)";
+        } else if (stepId.equals("hail_mary_3")) {
+            return "Hail Mary (Charity)";
+        } else if (stepId.startsWith("hail_mary_decade_")) {
+            String decade = stepId.replace("hail_mary_decade_", "");
+            return "Hail Mary Decade #" + decade;
+        } else if (stepId.startsWith("glory_be_")) {
+            String num = stepId.replace("glory_be_", "");
+            return "Glory Be #" + num;
+        } else if (stepId.startsWith("fatima_prayer_")) {
+            String num = stepId.replace("fatima_prayer_", "");
+            return "Fatima Prayer #" + num;
+        } else if (stepId.startsWith("mystery_")) {
+            String num = stepId.replace("mystery_", "");
+            return "Mystery #" + num;
+        } else if (stepId.equals("hail_holy_queen")) {
+            return "Hail Holy Queen";
+        } else if (stepId.equals("final_prayer")) {
+            return "Final Prayer";
         } else {
             return "Prayer Bead";
         }
